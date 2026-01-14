@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বাংলা ভয়েস জেনারেটর প্রো</title>
+    <!-- গুগল ফন্ট -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #009688;
+            --primary-hover: #00796b;
+            --secondary-color: #ff9800;
+            --secondary-hover: #f57c00;
+            --danger-color: #f44336;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 650px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 5px; }
+        header p { font-size: 0.9rem; opacity: 0.9; }
+
+        main { padding: 25px; }
+
+        /* ইনপুট এরিয়া */
+        .input-group { margin-bottom: 20px; }
+        
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-color); }
+
+        textarea {
+            width: 100%;
+            height: 130px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Hind Siliguri', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus { outline: none; border-color: var(--primary-color); }
+
+        .char-count { text-align: right; font-size: 0.8rem; color: #666; margin-top: 5px; }
+
+        /* প্রিসেট বাটন */
+        .presets-container {
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        
+        .presets-title {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .presets-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background: white;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Hind Siliguri', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover, .preset-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* সেটিংস এরিয়া */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        @media (min-width: 480px) { .settings-grid { grid-template-columns: 1fr 1fr; } }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        .slider-container { display: flex; flex-direction: column; }
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; color: #666; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--primary-color); }
+
+        /* বাটন এরিয়া */
+        .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;}
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Hind Siliguri', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background-color: var(--primary-color); color: white; flex: 2; justify-content: center; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-secondary { background-color: #e0e0e0; color: #333; flex: 1; justify-content: center; }
+        .btn-secondary:hover { background-color: #d0d0d0; }
+
+        .btn-danger { background-color: #ffcdd2; color: #c62828; flex: 1; justify-content: center; }
+        .btn-danger:hover { background-color: #ef9a9a; }
+        
+        /* ডাউনলোড বাটন */
+        .btn-download { 
+            background-color: var(--secondary-color); 
+            color: white; 
+            width: 100%; 
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .btn-download:hover { background-color: var(--secondary-hover); }
+
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+        /* স্ট্যাটাস বার */
+        .status-bar {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 6px;
+            color: #2e7d32;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+        .status-bar.error { background-color: #ffebee; color: #c62828; }
+
+        .icon { width: 20px; height: 20px; fill: currentColor; }
+
+        footer { text-align: center; padding: 15px; font-size: 0.8rem; color: #777; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>বাংলা ভয়েস জেনারেটর প্রো</h1>
+            <p>মজার ভয়েস এবং ডাউনলোড সুবিধা</p>
+        </header>
+
+        <main>
+            <!-- টেক্সট ইনপুট -->
+            <div class="input-group">
+                <label for="text-input">আপনার টেক্সট লিখুন:</label>
+                <textarea id="text-input" placeholder="এখানে লিখুন...">আমি একটি কৃত্রিম বুদ্ধিমত্তা। আমি আপনাদের সাথে কথা বলতে পারি।</textarea>
+                <div class="char-count"><span id="char-count-val">0</span> অক্ষর</div>
+            </div>
+
+            <!-- প্রিসেট (মজার ভয়েস) -->
+            <div class="presets-container">
+                <div class="presets-title">ভয়েস ইফেক্ট (Funny Effects):</div>
+                <div class="presets-buttons">
+                    <button class="preset-btn" onclick="applyPreset('normal')">স্বাভাবিক</button>
+                    <button class="preset-btn" onclick="applyPreset('chipmunk')">তেলের চামচ 🐿️</button>
+                    <button class="preset-btn" onclick="applyPreset('monster')">রাক্ষস 👹</button>
+                    <button class="preset-btn" onclick="applyPreset('robot')">রোবট 🤖</button>
+                    <button class="preset-btn" onclick="applyPreset('drunk')">মাতাল 🍾</button>
+                </div>
+            </div>
+
+            <!-- সেটিংস -->
+            <div class="settings-grid">
+                <div class="input-group">
+                    <label for="voice-select">ভয়েস নির্বাচন:</label>
+                    <select id="voice-select"></select>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-header"><span>গতি (Rate)</span><span id="rate-value">1.0</span></div>
+                    <input type="range" id="rate" min="0.5" max="2" value="1" step="0.1">
+                </div>
+                <div class="slider-container">
+                    <div class="slider-header"><span>সুর (Pitch)</span><span id="pitch-value">1.0</span></div>
+                    <input type="range" id="pitch" min="0.5" max="2" value="1" step="0.1">
+                </div>
+            </div>
+
+            <!-- বাটন -->
+            <div class="controls">
+                <button id="btn-speak" class="btn-primary">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> শুনুন
+                </button>
+                <button id="btn-pause" class="btn-secondary" disabled>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> পজ
+                </button>
+                <button id="btn-stop" class="btn-danger" disabled>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg> বন্ধ
+                </button>
+            </div>
+
+            <!-- ডাউনলোড বাটন -->
+            <button id="btn-record" class="btn-download">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                রেকর্ড ও ডাউনলোড করুন
+            </button>
+
+            <div id="status-bar" class="status-bar"></div>
+        </main>
+
+        <footer>
+            &copy; ২০২৪ বাংলা ভয়েস জেনারেটর
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const textInput = document.getElementById('text-input');
+        const voiceSelect = document.getElementById('voice-select');
+        const rateInput = document.getElementById('rate');
+        const pitchInput = document.getElementById('pitch');
+        const rateValue = document.getElementById('rate-value');
+        const pitchValue = document.getElementById('pitch-value');
+        const btnSpeak = document.getElementById('btn-speak');
+        const btnPause = document.getElementById('btn-pause');
+        const btnStop = document.getElementById('btn-stop');
+        const btnRecord = document.getElementById('btn-record');
+        const statusBar = document.getElementById('status-bar');
+        const charCountVal = document.getElementById('char-count-val');
+        const presetBtns = document.querySelectorAll('.preset-btn');
+
+        // Speech API Setup
+        const synth = window.speechSynthesis;
+        let voices = [];
+        let isPaused = false;
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+
+        // 1. Voice Loading Logic
+        function populateVoices() {
+            voices = synth.getVoices();
+            voiceSelect.innerHTML = '';
+
+            const bengaliVoices = voices.filter(voice => voice.lang.includes('bn') || voice.lang.includes('BN'));
+            const otherVoices = voices.filter(voice => !voice.lang.includes('bn') && !voice.lang.includes('BN'));
+
+            if (bengaliVoices.length > 0) {
+                const bnGroup = document.createElement('optgroup');
+                bnGroup.label = "বাংলা ভয়েস";
+                bengaliVoices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.value = voice.name;
+                    option.setAttribute('data-lang', voice.lang);
+                    option.setAttribute('data-name', voice.name);
+                    bnGroup.appendChild(option);
+                });
+                voiceSelect.appendChild(bnGroup);
+            }
+
+            if (otherVoices.length > 0) {
+                const otherGroup = document.createElement('optgroup');
+                otherGroup.label = "অন্যান্য ভয়েস";
+                otherVoices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.value = voice.name;
+                    option.setAttribute('data-lang', voice.lang);
+                    option.setAttribute('data-name', voice.name);
+                    otherGroup.appendChild(option);
+                });
+                voiceSelect.appendChild(otherGroup);
+            }
+        }
+        
+        populateVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoices;
+        }
+
+        // 2. Speak Logic
+        function speak(isRecordingMode = false) {
+            if (synth.speaking && !isPaused) return;
+            if (isPaused && !isRecordingMode) {
+                synth.resume();
+                isPaused = false;
+                updatePauseBtnUI(false);
+                return;
+            }
+            if (textInput.value === '') {
+                showStatus('দয়া করে কিছু লিখুন!', 'error');
+                return;
+            }
+
+            // Cancel previous to ensure clean slate
+            synth.cancel(); 
+
+            const utterThis = new SpeechSynthesisUtterance(textInput.value);
+            
+            // Set Voice
+            const selectedOption = voiceSelect.selectedOptions[0];
+            if(selectedOption) {
+                const selectedVoice = voices.find(v => v.name === selectedOption.getAttribute('data-name'));
+                utterThis.voice = selectedVoice;
+            }
+
+            // Set Parameters
+            utterThis.rate = rateInput.value;
+            utterThis.pitch = pitchInput.value;
+
+            // Events
+            utterThis.onstart = () => {
+                showStatus(isRecordingMode ? 'রেকর্ডিং শুরু হয়েছে... (অডিও চালু রাখুন)' : 'কথা বলা শুরু হয়েছে...');
+                toggleButtons(true);
+                if (isRecordingMode) btnRecord.disabled = true;
+            };
+
+            utterThis.onend = () => {
+                if (isRecordingMode && mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop(); // Stop recording when speech ends
+                } else {
+                    showStatus('শেষ হয়েছে।');
+                    setTimeout(() => { resetUI(); }, 2000);
+                }
+            };
+
+            utterThis.onerror = (e) => {
+                console.error(e);
+                showStatus('ত্রুটি হয়েছে।', 'error');
+                resetUI();
+            };
+
+            synth.speak(utterThis);
+        }
+
+        // 3. Recording & Download Logic
+        async function startRecordingProcess() {
+            if (textInput.value === '') {
+                showStatus('দয়া করে কিছু লিখুন!', 'error');
+                return;
+            }
+
+            try {
+                // Request to capture Tab Audio
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true, // Video track is required to get audio in some browsers, we'll ignore it later
+                    audio: true,
+                    preferCurrentTab: true // Hints browser to select this tab
+                });
+
+                // Check if user shared audio
+                const audioTrack = stream.getAudioTracks()[0];
+                if (!audioTrack) {
+                    showStatus('অডিও শেয়ার করা হয়নি! অনুগ্রহ করে "Share Tab Audio" চেক করে আবার চেষ্টা করুন।', 'error');
+                    stream.getTracks().forEach(track => track.stop()); // Stop stream
+                    return;
+                }
+
+                // Setup MediaRecorder
+                const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'video/webm';
+                mediaRecorder = new MediaRecorder(stream, { mimeType });
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    // Stop all tracks to release sharing indicator
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // Create Blob and Download
+                    const blob = new Blob(audioChunks, { type: mimeType });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'voice-recording.webm';
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Cleanup
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                        showStatus('ডাউনলোড শুরু হয়েছে!');
+                        resetUI();
+                    }, 100);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                
+                // Start Speaking
+                speak(true);
+
+            } catch (err) {
+                console.error(err);
+                showStatus('রেকর্ডিং ব্যর্থ হয়েছে।', 'error');
+            }
+        }
+
+        // 4. Preset Logic (Funny Voices)
+        function applyPreset(type) {
+            // Remove active class from all buttons
+            presetBtns.forEach(btn => btn.classList.remove('active'));
+            
+            // Find clicked button (approximation) - visually handled by user mostly
+            
+            switch(type) {
+                case 'normal':
+                    rateInput.value = 1;
+                    pitchInput.value = 1;
+                    break;
+                case 'chipmunk': // তেলের চামচ
+                    rateInput.value = 1.5;
+                    pitchInput.value = 1.8;
+                    break;
+                case 'monster': // রাক্ষস
+                    rateInput.value = 0.6;
+                    pitchInput.value = 0.5;
+                    break;
+                case 'robot': // রোবট
+                    rateInput.value = 0.9;
+                    pitchInput.value = 0.7;
+                    break;
+                case 'drunk': // মাতাল (Variable speed simulation not possible directly, so we just lower pitch)
+                    rateInput.value = 0.8;
+                    pitchInput.value = 0.6;
+                    break;
+            }
+            // Update UI values
+            rateValue.textContent = rateInput.value;
+            pitchValue.textContent = pitchInput.value;
+            showStatus(`'${type}' প্রিসেট সেট করা হয়েছে।`);
+        }
+
+        // Helper Functions
+        function togglePauseBtnUI(paused) {
+            if (paused) {
+                btnPause.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> চালু করুন';
+            } else {
+                btnPause.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> পজ';
+            }
+        }
+
+        function toggleButtons(isSpeaking) {
+            btnSpeak.disabled = isSpeaking;
+            btnPause.disabled = !isSpeaking;
+            btnStop.disabled = !isSpeaking;
+            voiceSelect.disabled = isSpeaking;
+            
+            if(isSpeaking) {
+                btnSpeak.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg> চলছে...';
+            } else {
+                btnSpeak.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> শুনুন';
+            }
+        }
+
+        function resetUI() {
+            toggleButtons(false);
+            isPaused = false;
+            isRecording = false;
+            btnRecord.disabled = false;
+            updatePauseBtnUI(false);
+            setTimeout(hideStatus, 3000);
+        }
+
+        function stopSpeaking() {
+            if (synth.speaking) {
+                synth.cancel();
+                resetUI();
+            }
+        }
+
+        function showStatus(msg, type = 'success') {
+            statusBar.textContent = msg;
+            statusBar.className = 'status-bar';
+            statusBar.style.display = 'block';
+            if (type === 'error') statusBar.classList.add('error');
+        }
+        function hideStatus() { statusBar.style.display = 'none'; }
+
+        // Event Listeners
+        textInput.addEventListener('input', () => charCountVal.textContent = textInput.value.length);
+        rateInput.addEventListener('input', () => rateValue.textContent = rateInput.value);
+        pitchInput.addEventListener('input', () => pitchValue.textContent = pitchInput.value);
+        
+        btnSpeak.addEventListener('click', () => speak(false));
+        btnPause.addEventListener('click', () => {
+            if (synth.speaking) {
+                if (synth.paused) {
+                    synth.resume();
+                    isPaused = false;
+                } else {
+                    synth.pause();
+                    isPaused = true;
+                }
+                updatePauseBtnUI(isPaused);
+            }
+        });
+        btnStop.addEventListener('click', stopSpeaking);
+        btnRecord.addEventListener('click', startRecordingProcess);
+
+        // Initial update
+        charCountVal.textContent = textInput.value.length;
+
+    </script>
+</body>
+</html>
